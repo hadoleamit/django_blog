@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+
+    
+    <div class="col-sm-7 col-sm-offset-3">
+    <h1>{{ title }}</h1><hr/>
+    <form method="GET" action="">
+        <input type="text" name='q' placeholder="Search Posts" value='{{ request.GET.q }}'/>
+        <input type="submit" value="Search" /><hr/>
+    </form>
+    <div class="row">
+    {% for obj in object_list %}
+    
+    
+        <div class="col-sm-12 ">
+        
+          <div class="thumbnail">
+            {% if obj.image %}
+                <img src="{{ obj.image.url }}" class="img-responsive"/><br>
+            {% endif %}
+            <div class="caption">
+              {% if obj.draft %}<h3>Staff Only : Draft </h3>{% endif %}{% if obj.publish > today %}<h3>Staff Only: Future Post </h3>{% endif %}
+              <h3><a href='{{obj.get_absolute_url}}'>{{ obj.title }}</a><small> {{ obj.publish }}</small></h3>
+              {% if obj.user.get_full_name %}
+              <p>Author: {{ obj.user.get_full_name }}</p>
+              {% endif %}
+
+              <p>{% autoescape off %}{{ obj.content|linebreaks|truncatechars:120 }}{% endautoescape %}</p>
+              <p><a href="{{obj.get_absolute_url}}" class="btn btn-primary" role="button">View</a> 
+            </div>
+          </div>
+        <hr/>
+        </div>
+      
+
+    {% cycle "" "<div class='col-sm-12'></div></div><div class='row'>" %}
+    {% endfor %}
+
+    <div class="pagination">
+            <span class="step-links">
+                {% if object_list.has_previous %}
+                    <a href="?{{ page_request_var}}={{ object_list.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Previous </a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ object_list.number }} of {{ object_list.paginator.num_pages }}.
+                </span>
+        
+                {% if object_list.has_next %}
+                    <a href="?{{ page_request_var}}={{ object_list.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif%}">Next &raquo;</a>
+                {% endif %}
+            </span>
+    </div>
+    
+     
+{% endblock content %}
